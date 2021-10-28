@@ -1,11 +1,20 @@
 import "./App.css";
 
-import { Button } from "@mui/material";
+import { BrowserRouter, Switch, Route } from "react-router-dom";
+import Navigation from "./features/Navigation/Navigation";
+import AdminHome from "./features/AdminHome/AdminHome";
 
 function App() {
 	return (
 		<div className="App">
-			<Button variant="contained">Hello World</Button>
+			<BrowserRouter>
+				<Navigation />
+				<Switch>
+					<Route exact path="/adminHome">
+						<AdminHome />
+					</Route>
+				</Switch>
+			</BrowserRouter>
 		</div>
 	);
 }
