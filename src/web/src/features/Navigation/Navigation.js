@@ -1,11 +1,7 @@
 import "./Navigation.css";
 
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
-import CodeIcon from "@mui/icons-material/Code";
+import { AppBar, Box, Toolbar, Typography, IconButton } from "@mui/material";
+import { Code } from "@mui/icons-material";
 
 function Navigation() {
 	return (
@@ -19,7 +15,7 @@ function Navigation() {
 						aria-label="menu"
 						sx={{ mr: 2 }}
 					>
-						<CodeIcon />
+						<Code />
 					</IconButton>
 					<Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
 						Code Skills Improver
