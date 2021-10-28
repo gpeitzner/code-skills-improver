@@ -14,7 +14,7 @@ function App() {
 					<Route exact path="/">
 						<Login />
 					</Route>
-					<Route exact path="/adminHome">
+					<Route exact path="/adminHome/:email?">
 						<AdminHome />
 					</Route>
 				</Switch>

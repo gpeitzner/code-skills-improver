@@ -39,7 +39,7 @@ function Login() {
 			userCredentials.email === "admin" &&
 			userCredentials.password === "admin"
 		) {
-			history.push("adminHome");
+			history.push(`adminHome/admin`);
 			return;
 		}
 	};
