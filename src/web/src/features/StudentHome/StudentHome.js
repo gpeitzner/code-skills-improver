@@ -15,11 +15,12 @@ import {
 	TableRow,
 	TableCell,
 	TableBody,
+	Button,
 } from "@mui/material";
 
 import problemImage from "../../assets/problem_image.jpg";
 import testsImage from "../../assets/tests_image.jpg";
-import { Check, Error } from "@mui/icons-material";
+import { Check, Error, PlayCircle } from "@mui/icons-material";
 import AceEditor from "react-ace";
 import { useState } from "react";
 import "ace-builds/webpack-resolver";
@@ -44,7 +45,8 @@ function StudentHome() {
 		),
 	];
 
-	const [code, setCode] = useState(`# Naive method to find a pair in a list with the given sum
+	const [code, setCode] =
+		useState(`# Naive method to find a pair in a list with the given sum
 	def findPair(nums, target):
 	 
 		# consider each element except the last
@@ -104,7 +106,7 @@ function StudentHome() {
 						sx={{ height: "45vh" }}
 					>
 						<AceEditor
-							style={{ height: "100%", width: "100%" }}
+							style={{ height: "90%", width: "100%" }}
 							placeholder="Place your solution here..."
 							mode="python"
 							theme="monokai"
@@ -113,6 +115,14 @@ function StudentHome() {
 							fontSize={14}
 							value={code}
 						/>
+						<Button
+							sx={{ width: "100%" }}
+							variant="contained"
+							color="success"
+							endIcon={<PlayCircle />}
+						>
+							Run
+						</Button>
 					</Grid>
 					<Grid
 						item
@@ -174,7 +184,21 @@ function StudentHome() {
 						xl={6}
 						sx={{ height: "45vh" }}
 					>
-						<p>Item 4</p>
+						<Card
+							sx={{ height: "100%", backgroundColor: "black", color: "white" }}
+						>
+							<CardHeader title="Terminal" />
+							<CardContent>
+								<Typography variant="body1">
+									{"student1@codeskillsimprover:~$ 	whoami"}
+								</Typography>
+								<Typography variant="body1">{"student1"}</Typography>
+								<Typography variant="body1">
+									{"student1@codeskillsimprover:~$	ls"}
+								</Typography>
+								<Typography variant="body1">{"dev"}</Typography>
+							</CardContent>
+						</Card>
 					</Grid>
 				</Grid>
 			</Box>
