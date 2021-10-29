@@ -20,6 +20,9 @@ import {
 import problemImage from "../../assets/problem_image.jpg";
 import testsImage from "../../assets/tests_image.jpg";
 import { Check, Error } from "@mui/icons-material";
+import AceEditor from "react-ace";
+import { useState } from "react";
+import "ace-builds/webpack-resolver";
 
 function StudentHome() {
 	function createData(number, input, output, status) {
@@ -40,6 +43,29 @@ function StudentHome() {
 			true
 		),
 	];
+
+	const [code, setCode] = useState(`# Naive method to find a pair in a list with the given sum
+	def findPair(nums, target):
+	 
+		# consider each element except the last
+		for i in range(len(nums) - 1):
+	 
+			# start from the i'th element until the last element
+			for j in range(i + 1, len(nums)):
+	 
+				# if the desired sum is found, print it
+				if nums[i] + nums[j] == target:
+					print('Pair found', (nums[i], nums[j]))
+					return
+	 
+		# No pair with the given sum exists in the list
+		print('Pair not found')
+	 
+	 
+	if __name__ == '__main__':
+		nums = [8, 7, 2, 5, 3, 1]
+		target = 10
+		findPair(nums, target)`);
 
 	return (
 		<div className="StudentHome">
@@ -77,7 +103,16 @@ function StudentHome() {
 						xl={6}
 						sx={{ height: "45vh" }}
 					>
-						<p>Item 2</p>
+						<AceEditor
+							style={{ height: "100%", width: "100%" }}
+							placeholder="Place your solution here..."
+							mode="python"
+							theme="monokai"
+							name="basic-code-editor"
+							onChange={(currentCode) => setCode(currentCode)}
+							fontSize={14}
+							value={code}
+						/>
 					</Grid>
 					<Grid
 						item
