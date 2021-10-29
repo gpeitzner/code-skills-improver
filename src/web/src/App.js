@@ -16,7 +16,7 @@ function App() {
 					<Route exact path="/">
 						<Login />
 					</Route>
-					<Route exact path="/adminHome/:email?">
+					<Route exact path="/adminHome">
 						<AdminHome />
 					</Route>
 					<Route exact path="/studentHome">
