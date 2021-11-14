@@ -6,6 +6,7 @@ import AdminHome from "./features/AdminHome/AdminHome";
 import Login from "./features/Login/Login";
 import StudentHome from "./features/StudentHome/StudentHome";
 import Solver from "./features/Solver/Solver";
+import User from "./features/User/User";
 
 function App() {
 	return (
@@ -24,6 +25,9 @@ function App() {
 					</Route>
 					<Route exact path="/solver">
 						<Solver />
+					</Route>
+					<Route exat path="/user">
+						<User />
 					</Route>
 				</Switch>
 			</BrowserRouter>
