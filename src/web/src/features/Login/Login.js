@@ -39,7 +39,14 @@ function Login() {
 			userCredentials.email === "admin" &&
 			userCredentials.password === "admin"
 		) {
-			history.push(`adminHome/admin`);
+			history.push(`adminHome`);
+			return;
+		}
+		if (
+			userCredentials.email === "student" &&
+			userCredentials.password === "student"
+		) {
+			history.push(`studentHome`);
 			return;
 		}
 	};

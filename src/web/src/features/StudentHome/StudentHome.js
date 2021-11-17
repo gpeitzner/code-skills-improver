@@ -16,6 +16,7 @@ import { Try } from "@mui/icons-material";
 import problemImage from "../../assets/problem_image.jpg";
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
+import { useHistory } from "react-router-dom";
 
 function LinearProgressWithLabel(props) {
 	return (
@@ -42,6 +43,7 @@ LinearProgressWithLabel.propTypes = {
 
 function StudentHome() {
 	const [progress, setProgress] = useState(10);
+	const history = useHistory();
 
 	useEffect(() => {
 		const timer = setInterval(() => {
@@ -60,7 +62,10 @@ function StudentHome() {
 				<Grid container spacing={2}>
 					<Grid item xs={12} sm={4} md={4} lg={3} xl={3}>
 						<Box sx={{ height: "100%" }}>
-							<Card sx={{ height: "40vh" }}>
+							<Card
+								sx={{ height: "40vh" }}
+								onClick={() => history.push("solver")}
+							>
 								<CardHeader title="Problem" />
 								<CardMedia component="img" height="100" image={problemImage} />
 								<CardContent>

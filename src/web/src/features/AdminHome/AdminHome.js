@@ -12,15 +12,21 @@ import {
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import HelpIcon from "@mui/icons-material/Help";
 import QueryStatsIcon from "@mui/icons-material/QueryStats";
+import { useHistory } from "react-router-dom";
 
 function AdminHome() {
+	const history = useHistory();
+
 	return (
 		<div className="AdminHome">
 			<Box sx={{ flexGrow: 1, width: "100%", heigth: "90vh" }}>
 				<Grid container spacing={2}>
 					<Grid item xs={12} sm={4} md={4} lg={3} xl={3}>
 						<Box sx={{ height: "100%" }}>
-							<Card sx={{ height: "40vh" }}>
+							<Card
+								sx={{ height: "40vh" }}
+								onClick={() => history.push("user")}
+							>
 								<CardActionArea sx={{ height: "100%" }}>
 									<CardHeader title="Users" />
 									<CardContent>
