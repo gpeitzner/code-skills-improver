@@ -16,20 +16,23 @@ router.post("/execution", async (req, res, next) => {
 		fs.mkdirSync(executionDirectory, {
 			recursive: true,
 		});
-		fs.writeFileSync(`${executionDirectory}/Dockerfile`, "");
-		fs.writeFileSync(`${executionDirectory}/app.py`, "");
-		const { stderr, stdout } = await commander("ls -lash");
+		const executionScript = `${executionDirectory}/app.py`;
+		fs.writeFileSync(executionScript, baseCode);
+		const { stderr, stdout } = await commander(
+			`docker run --rm --name ${executionName} -v ${executionDirectory}:/usr/src/myapp -w /usr/src/myapp python:3 python app.py`
+		);
 		if (stderr)
 			return res.status(404).json({
 				message: "Critical error while executing code",
 				data: req.body,
 				error: stderr,
 			});
-		res.json({
-			message: stdout.split("\n"),
+		fs.rmdirSync(executionDirectory, { recursive: true });
+		return res.json({
+			message: stdout.split("\n")[0],
 		});
 	} catch (error) {
-		res.status(500).json({
+		return res.status(500).json({
 			message: "Critical error while executing code",
 			data: req.body,
 			error: error,
