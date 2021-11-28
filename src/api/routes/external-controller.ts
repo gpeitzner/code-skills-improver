@@ -4,13 +4,20 @@ const router = express.Router();
 import pool from "../utils/db";
 import util from "util";
 import { exec } from "child_process";
+import fs from "fs";
 
 const commander = util.promisify(exec);
 
 router.post("/execution", async (req, res, next) => {
 	try {
 		const { baseCode } = req.body;
-		console.log(baseCode);
+		const executionName = Date.now();
+		const executionDirectory = `${__dirname}/executions/${executionName}`;
+		fs.mkdirSync(executionDirectory, {
+			recursive: true,
+		});
+		fs.writeFileSync(`${executionDirectory}/Dockerfile`, "");
+		fs.writeFileSync(`${executionDirectory}/app.py`, "");
 		const { stderr, stdout } = await commander("ls -lash");
 		if (stderr)
 			return res.status(404).json({
