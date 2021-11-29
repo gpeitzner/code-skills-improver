@@ -7,6 +7,7 @@ import Login from "./features/Login/Login";
 import StudentHome from "./features/StudentHome/StudentHome";
 import Solver from "./features/Solver/Solver";
 import User from "./features/User/User";
+import Problem from "./features/Problem/Problem";
 
 function App() {
 	return (
@@ -26,8 +27,11 @@ function App() {
 					<Route exact path="/solver">
 						<Solver />
 					</Route>
-					<Route exat path="/user">
+					<Route exact path="/user">
 						<User />
+					</Route>
+					<Route exact path="/problem">
+						<Problem />
 					</Route>
 				</Switch>
 			</BrowserRouter>

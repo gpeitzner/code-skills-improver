@@ -48,10 +48,10 @@ function User() {
 		if (search === "") return;
 		const [searchData] = await searchRequest(search);
 		if (!searchData) {
-			setUser({ ...user, ...userInitialState });
+			setUser({ ...user, ...userInitialState, email: search });
 			return;
 		}
-		setUser({ ...user, ...searchData, email: search });
+		setUser({ ...user, ...searchData });
 	};
 
 	const handleSelect = (event, attribute) => {
@@ -83,6 +83,7 @@ function User() {
 
 	const handleSubmit = async () => {
 		if (user._user_id === 0) {
+			debugger;
 			if (user.email === "") return;
 			if (user.user_type_id === 0) return;
 			if (user.first_name === "") return;
@@ -206,6 +207,7 @@ function User() {
 					variant="contained"
 					sx={{ width: "100%", marginBottom: "20px" }}
 					onClick={handleSubmit}
+					color="success"
 				>
 					{user._user_id === 0 ? "SAVE" : "UPDATE"}
 				</Button>
