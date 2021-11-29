@@ -22,52 +22,39 @@ import problemImage from "../../assets/problem_image.jpg";
 import testsImage from "../../assets/tests_image.jpg";
 import { Check, Error, PlayCircle } from "@mui/icons-material";
 import AceEditor from "react-ace";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "ace-builds/webpack-resolver";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import { API_URL } from "../../utils/config";
 
 function Solver() {
-	function createData(number, input, output, status) {
-		return { number, input, output, status };
-	}
+	const { id } = useParams();
+	const [problem, setProblem] = useState({});
+	const [unitTests, setUnitTests] = useState([]);
+	const [code, setCode] = useState("");
 
-	const rows = [
-		createData(
-			"1",
-			`nums = [8, 7, 2, 5, 3, 1]; target = 10;`,
-			`Pair found (8, 2) or Pair found (7, 3)`,
-			false
-		),
-		createData(
-			"2",
-			`nums = [5, 2, 6, 8, 1, 9]; target = 12;`,
-			`Pair not found`,
-			true
-		),
-	];
+	useEffect(() => {
+		function getMasterData() {
+			axios
+				.post(`${API_URL}/query/get-problem-by-id`, { problem_id: id })
+				.then((response) => {
+					setProblem(response.data.rows[0]);
+				});
+			axios
+				.post(`${API_URL}/query/get-unit-tests-by-problem-id`, {
+					problem_id: id,
+				})
+				.then((response) => {
+					setUnitTests(response.data.rows);
+				});
+		}
+		getMasterData();
+	}, [id]);
 
-	const [code, setCode] =
-		useState(`# Naive method to find a pair in a list with the given sum
-	def findPair(nums, target):
-	 
-		# consider each element except the last
-		for i in range(len(nums) - 1):
-	 
-			# start from the i'th element until the last element
-			for j in range(i + 1, len(nums)):
-	 
-				# if the desired sum is found, print it
-				if nums[i] + nums[j] == target:
-					print('Pair found', (nums[i], nums[j]))
-					return
-	 
-		# No pair with the given sum exists in the list
-		print('Pair not found')
-	 
-	 
-	if __name__ == '__main__':
-		nums = [8, 7, 2, 5, 3, 1]
-		target = 10
-		findPair(nums, target)`);
+	const handleRun = async () => {
+		console.log("RUN");
+	};
 
 	return (
 		<div className="Solver">
@@ -87,12 +74,9 @@ function Solver() {
 							<CardMedia component="img" height="100" image={problemImage} />
 							<CardContent>
 								<Typography variant="h6" component="div">
-									Find a pair with the given sum in an array
+									{problem.title}
 								</Typography>
-								<Typography variant="body1">
-									Given an unsorted integer array, find a pair with the given
-									sum in it.
-								</Typography>
+								<Typography variant="body1">{problem.description}</Typography>
 							</CardContent>
 						</Card>
 					</Grid>
@@ -120,6 +104,7 @@ function Solver() {
 							variant="contained"
 							color="success"
 							endIcon={<PlayCircle />}
+							onClick={handleRun}
 						>
 							Run
 						</Button>
@@ -152,7 +137,7 @@ function Solver() {
 											</TableRow>
 										</TableHead>
 										<TableBody>
-											{rows.map((row, i) => (
+											{unitTests.map((row, i) => (
 												<TableRow
 													key={i}
 													sx={{
@@ -164,9 +149,7 @@ function Solver() {
 													</TableCell>
 													<TableCell>{row.input}</TableCell>
 													<TableCell>{row.output}</TableCell>
-													<TableCell>
-														{row.status ? <Check /> : <Error />}
-													</TableCell>
+													<TableCell>{true ? <Check /> : <Error />}</TableCell>
 												</TableRow>
 											))}
 										</TableBody>

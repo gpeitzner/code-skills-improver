@@ -21,6 +21,10 @@ const querys: Query[] = [
 		name: "get-unit-tests-by-problem-id",
 		dml: "SELECT * FROM unit_test WHERE problem_id = $1",
 	},
+	{
+		name: "get-problem-by-id",
+		dml: "SELECT * FROM problem WHERE problem_id = $1",
+	},
 ];
 
 export default querys;
