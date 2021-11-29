@@ -71,7 +71,7 @@ function User() {
 		try {
 			const response = await axios.put(`${API_URL}/crud/_user`, {
 				filter: {
-					email: user.email,
+					_user_id: user._user_id,
 				},
 				new: user,
 			});
@@ -83,7 +83,6 @@ function User() {
 
 	const handleSubmit = async () => {
 		if (user._user_id === 0) {
-			debugger;
 			if (user.email === "") return;
 			if (user.user_type_id === 0) return;
 			if (user.first_name === "") return;
@@ -102,7 +101,6 @@ function User() {
 		const userData = user;
 		const [updateData] = await updateRequest(userData);
 		if (!updateData) return;
-		console.log(updateData);
 		setUser({ ...user, ...updateData });
 	};
 

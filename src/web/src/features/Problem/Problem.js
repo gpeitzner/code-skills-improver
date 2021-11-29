@@ -45,17 +45,90 @@ function Problem() {
 		}
 	};
 
+	const searchUnitTests = async (problem_id) => {
+		try {
+			const response = await axios.post(
+				`${API_URL}/query/get-unit-tests-by-problem-id`
+			);
+			return [response.data.rows, null];
+		} catch (error) {
+			return [null, error];
+		}
+	};
+
+	const saveRequest = async (problem, unitTests) => {
+		try {
+			const response = await axios.post(`${API_URL}/crud/problem`, problem);
+			const problem_id = response.data.data[0].problem_id;
+			for (let i = 0; i < unitTests.length; i++) {
+				let unitTest = unitTests[i];
+				delete unitTest.unit_test_id;
+				unitTest.problem_id = problem_id;
+				await axios.post(`${API_URL}/crud/unit_test`, unitTest);
+			}
+			return [response.data.data[0], null];
+		} catch (error) {
+			return [null, error];
+		}
+	};
+
+	const updateRequest = async (problem, unitTests) => {
+		try {
+			const response = await axios.put(`${API_URL}/crud/problem`, {
+				filter: {
+					problem_id: problem.problem_id,
+				},
+				new: problem,
+			});
+			const problem_id = response.data.data[0].problem_id;
+			await axios.post(`${API_URL}/query/delete-unit-tests`, {
+				problem_id: problem_id,
+			});
+			for (let i = 0; i < unitTests.length; i++) {
+				let unitTest = unitTests[i];
+				delete unitTest.unit_test_id;
+				unitTest.problem_id = problem_id;
+				await axios.post(`${API_URL}/crud/unit_test`, unitTest);
+			}
+			return [response.data.data[0], null];
+		} catch (error) {
+			return [null, error];
+		}
+	};
+
 	const handleSearch = async () => {
+		debugger;
 		if (search === "") return;
 		const [searchData] = await searchRequest(search);
 		if (!searchData) {
 			setProblem({ ...problem, ...problemInitialState, title: search });
 			return;
 		}
+		const [unitTestsData] = await searchUnitTests(searchData.problem_id);
+		if (unitTestsData) setUnitTests(unitTestsData);
 		setProblem({ ...problem, ...searchData });
 	};
 
-	const handleSubmit = async () => {};
+	const handleSubmit = async () => {
+		if (problem.problem_id === 0) {
+			if (problem.title === "") return;
+			if (problem.description === "") return;
+			if (problem.base_code === "") return;
+			if (unitTests.length === 0) return;
+			let problemData = problem;
+			let unitTestsData = unitTests;
+			delete problemData.problem_id;
+			const [saveData] = await saveRequest(problemData, unitTestsData);
+			if (!saveData) return;
+			setProblem({ ...problem, ...saveData });
+			return;
+		}
+		let problemData = problem;
+		let unitTestsData = unitTests;
+		const [updateData] = await updateRequest(problemData, unitTestsData);
+		if (!updateData) return;
+		setProblem({ ...problem, ...updateData });
+	};
 
 	const handleCreateUnitTest = async () => {
 		if (currentUnitTest.input === "") return;
