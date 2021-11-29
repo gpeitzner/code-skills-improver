@@ -9,6 +9,7 @@ import axios from "axios";
 import { useState } from "react";
 import { API_URL } from "../../utils/config";
 import "./Problem.css";
+import AceEditor from "react-ace";
 
 function Problem() {
 	const problemInitialState = {
@@ -21,6 +22,7 @@ function Problem() {
 
 	const [search, setSearch] = useState("");
 	const [problem, setProblem] = useState(problemInitialState);
+	const [baseCode, setBaseCode] = useState("");
 
 	const searchRequest = async (title) => {
 		try {
@@ -77,6 +79,17 @@ function Problem() {
 						setProblem({ ...problem, description: e.target.value.toString() })
 					}
 				/>
+				<AceEditor
+					style={{ height: "30vh", width: "100%", marginBottom: "20px" }}
+					placeholder="Base code"
+					mode="python"
+					theme="monokai"
+					name="basic-code-editor"
+					onChange={(currentCode) => setBaseCode(currentCode)}
+					fontSize={14}
+					value={baseCode}
+				/>
+				<Divider sx={{ marginBottom: "20px" }}>Unit Tests</Divider>
 				<Button
 					variant="contained"
 					sx={{ width: "100%", marginBottom: "20px" }}
