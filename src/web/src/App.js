@@ -24,7 +24,7 @@ function App() {
 					<Route exact path="/studentHome">
 						<StudentHome />
 					</Route>
-					<Route exact path="/solver">
+					<Route exact path="/solver/:id">
 						<Solver />
 					</Route>
 					<Route exact path="/user">

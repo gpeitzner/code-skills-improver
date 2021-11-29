@@ -17,6 +17,8 @@ import problemImage from "../../assets/problem_image.jpg";
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { useHistory } from "react-router-dom";
+import axios from "axios";
+import { API_URL } from "../../utils/config";
 
 function LinearProgressWithLabel(props) {
 	return (
@@ -42,55 +44,63 @@ LinearProgressWithLabel.propTypes = {
 };
 
 function StudentHome() {
-	const [progress, setProgress] = useState(10);
 	const history = useHistory();
+	const [problems, setProblems] = useState([]);
 
 	useEffect(() => {
-		const timer = setInterval(() => {
-			setProgress((prevProgress) =>
-				prevProgress >= 100 ? 10 : prevProgress + 10
-			);
-		}, 800);
-		return () => {
-			clearInterval(timer);
-		};
+		axios.get(`${API_URL}/crud/problem`).then((response) => {
+			setProblems(response.data);
+		});
 	}, []);
 
 	return (
 		<div className="StudentHome">
 			<Box sx={{ flexGrow: 1, width: "100%", heigth: "90vh" }}>
 				<Grid container spacing={2}>
-					<Grid item xs={12} sm={4} md={4} lg={3} xl={3}>
-						<Box sx={{ height: "100%" }}>
-							<Card
-								sx={{ height: "40vh" }}
-								onClick={() => history.push("solver")}
-							>
-								<CardHeader title="Problem" />
-								<CardMedia component="img" height="100" image={problemImage} />
-								<CardContent>
-									<Typography variant="h6" component="div">
-										Find a pair with the given sum in an array
-									</Typography>
-									<Typography variant="body1">
-										Given an unsorted integer array, find a pair with the given
-										sum in it.
-									</Typography>
-								</CardContent>
-							</Card>
-							<Box sx={{ width: "100%", mt: "10px", mb: "10px" }}>
-								<LinearProgressWithLabel value={progress} />
-							</Box>
-							<Button
-								sx={{ width: "100%" }}
-								variant="contained"
-								endIcon={<Try />}
-								color="success"
-							>
-								TRY
-							</Button>
-						</Box>
-					</Grid>
+					{problems.map(
+						(problem, i) =>
+							problem.status && (
+								<Grid item xs={12} sm={4} md={4} lg={3} xl={3} key={i}>
+									<Box sx={{ height: "100%" }}>
+										<Card
+											sx={{ height: "40vh" }}
+											onClick={() =>
+												history.push(`solver/${problem.problem_id}`)
+											}
+										>
+											<CardHeader title="Problem" />
+											<CardMedia
+												component="img"
+												height="100"
+												image={problemImage}
+											/>
+											<CardContent>
+												<Typography variant="h6" component="div">
+													{problem.title}
+												</Typography>
+												<Typography variant="body1">
+													{problem.description}
+												</Typography>
+											</CardContent>
+										</Card>
+										{/* <Box sx={{ width: "100%", mt: "10px", mb: "10px" }}>
+											<LinearProgressWithLabel value={10} />
+										</Box> */}
+										<Button
+											sx={{ width: "100%" }}
+											variant="contained"
+											endIcon={<Try />}
+											color="success"
+											onClick={() =>
+												history.push(`solver/${problem.problem_id}`)
+											}
+										>
+											TRY
+										</Button>
+									</Box>
+								</Grid>
+							)
+					)}
 				</Grid>
 			</Box>
 		</div>
