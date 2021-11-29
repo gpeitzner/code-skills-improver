@@ -7,7 +7,7 @@ import {
 	Grid,
 } from "@mui/material";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { API_URL } from "../../utils/config";
 import "./Problem.css";
 import AceEditor from "react-ace";
@@ -29,7 +29,6 @@ function Problem() {
 
 	const [search, setSearch] = useState("");
 	const [problem, setProblem] = useState(problemInitialState);
-	const [baseCode, setBaseCode] = useState("");
 	const [currentUnitTest, setCurrentUnitTest] = useState(unitTestInitialState);
 	const [unitTests, setUnitTests] = useState([]);
 
@@ -48,7 +47,8 @@ function Problem() {
 	const searchUnitTests = async (problem_id) => {
 		try {
 			const response = await axios.post(
-				`${API_URL}/query/get-unit-tests-by-problem-id`
+				`${API_URL}/query/get-unit-tests-by-problem-id`,
+				{ problem_id: problem_id }
 			);
 			return [response.data.rows, null];
 		} catch (error) {
@@ -97,11 +97,17 @@ function Problem() {
 	};
 
 	const handleSearch = async () => {
-		debugger;
-		if (search === "") return;
+		if (search === "") {
+			setProblem({ ...problem, ...problemInitialState, title: search });
+			setUnitTests([]);
+			setCurrentUnitTest(unitTestInitialState);
+			return;
+		}
 		const [searchData] = await searchRequest(search);
 		if (!searchData) {
 			setProblem({ ...problem, ...problemInitialState, title: search });
+			setUnitTests([]);
+			setCurrentUnitTest(unitTestInitialState);
 			return;
 		}
 		const [unitTestsData] = await searchUnitTests(searchData.problem_id);
@@ -139,7 +145,14 @@ function Problem() {
 		setCurrentUnitTest(unitTestInitialState);
 	};
 
-	useEffect(() => console.log(unitTests), [unitTests]);
+	const handleProblemStatus = async () => {
+		let problemData = problem;
+		let unitTestsData = unitTests;
+		problemData.status = !problemData.status;
+		const [updateData] = await updateRequest(problemData, unitTestsData);
+		if (!updateData) return;
+		setProblem({ ...problem, ...updateData });
+	};
 
 	return (
 		<div className="Problem">
@@ -173,14 +186,16 @@ function Problem() {
 					}
 				/>
 				<AceEditor
-					style={{ height: "30vh", width: "100%", marginBottom: "20px" }}
+					style={{ height: "20vh", width: "100%", marginBottom: "20px" }}
 					placeholder="Base code"
 					mode="python"
 					theme="monokai"
 					name="basic-code-editor"
-					onChange={(currentCode) => setBaseCode(currentCode)}
+					onChange={(currentCode) =>
+						setProblem({ ...problem, base_code: currentCode })
+					}
 					fontSize={14}
-					value={baseCode}
+					value={problem.base_code}
 				/>
 				{unitTests.map((unitTest, i) => (
 					<div key={i}>
@@ -313,23 +328,25 @@ function Problem() {
 					<Grid item xs={12} sm={12} lg={6} xl={6}>
 						<Button
 							variant="contained"
-							sx={{ width: "100%", marginBottom: "20px" }}
+							sx={{ width: "100%" }}
 							onClick={handleSubmit}
 							color="success"
 						>
 							{problem.problem_id === 0 ? "SAVE PROBLEM" : "UPDATE PROBLEM"}
 						</Button>
 					</Grid>
-					<Grid item xs={12} sm={12} lg={6} xl={6}>
-						<Button
-							variant="contained"
-							sx={{ width: "100%", marginBottom: "20px" }}
-							onClick={handleSubmit}
-							color="warning"
-						>
-							{problem.status ? "DISABLE" : "ACTIVATE"}
-						</Button>
-					</Grid>
+					{problem.problem_id !== 0 && (
+						<Grid item xs={12} sm={12} lg={6} xl={6}>
+							<Button
+								variant="contained"
+								sx={{ width: "100%", marginBottom: "20px" }}
+								onClick={handleProblemStatus}
+								color="warning"
+							>
+								{problem.status ? "DISABLE" : "ACTIVATE"}
+							</Button>
+						</Grid>
+					)}
 				</Grid>
 			</Box>
 		</div>

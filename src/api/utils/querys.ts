@@ -17,6 +17,10 @@ const querys: Query[] = [
 		name: "delete-unit-tests",
 		dml: "DELETE FROM unit_test WHERE problem_id = $1",
 	},
+	{
+		name: "get-unit-tests-by-problem-id",
+		dml: "SELECT * FROM unit_test WHERE problem_id = $1",
+	},
 ];
 
 export default querys;
