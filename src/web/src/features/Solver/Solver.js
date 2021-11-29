@@ -16,6 +16,9 @@ import {
 	TableCell,
 	TableBody,
 	Button,
+	List,
+	ListItem,
+	ListItemText,
 } from "@mui/material";
 
 import problemImage from "../../assets/problem_image.jpg";
@@ -33,6 +36,7 @@ function Solver() {
 	const [problem, setProblem] = useState({});
 	const [unitTests, setUnitTests] = useState([]);
 	const [code, setCode] = useState("");
+	const [terminalOutput, setTerminalOutput] = useState([]);
 
 	useEffect(() => {
 		function getMasterData() {
@@ -40,6 +44,7 @@ function Solver() {
 				.post(`${API_URL}/query/get-problem-by-id`, { problem_id: id })
 				.then((response) => {
 					setProblem(response.data.rows[0]);
+					setCode(response.data.rows[0].base_code);
 				});
 			axios
 				.post(`${API_URL}/query/get-unit-tests-by-problem-id`, {
@@ -53,7 +58,29 @@ function Solver() {
 	}, [id]);
 
 	const handleRun = async () => {
-		console.log("RUN");
+		let date = new Date();
+		date.setHours(date.getHours() - 6);
+		setTerminalOutput([
+			date.toISOString().replace("T", " ").replace("Z", "").split(".")[0],
+		]);
+		for (let i = 0; i < unitTests.length; i++) {
+			try {
+				const unitTest = unitTests[i];
+				const baseCode = code.concat("\n").concat(unitTest.code);
+				const codeExecutionResponse = await axios.post(
+					`${API_URL}/external/execution`,
+					{ baseCode: baseCode }
+				);
+				setTerminalOutput((prevState) =>
+					prevState.concat(`${codeExecutionResponse.data.message}`)
+				);
+				if (codeExecutionResponse.data.message === unitTest.output) {
+					console.log("[FLAG]", unitTest.unit_test_id);
+				}
+			} catch (error) {
+				console.error(error);
+			}
+		}
 	};
 
 	return (
@@ -172,14 +199,15 @@ function Solver() {
 						>
 							<CardHeader title="Terminal" />
 							<CardContent>
-								<Typography variant="body1">
-									{"student1@codeskillsimprover:~$ 	whoami"}
-								</Typography>
-								<Typography variant="body1">{"student1"}</Typography>
-								<Typography variant="body1">
-									{"student1@codeskillsimprover:~$	ls"}
-								</Typography>
-								<Typography variant="body1">{"dev"}</Typography>
+								<List style={{ maxHeight: "30vh", overflow: "auto" }}>
+									{terminalOutput.map((output, i) => (
+										<ListItem variant="body1" key={i}>
+											<ListItemText>
+												{`runtime@codeskillsimprover:~$ ${output}`}
+											</ListItemText>
+										</ListItem>
+									))}
+								</List>
 							</CardContent>
 						</Card>
 					</Grid>
