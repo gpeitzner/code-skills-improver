@@ -30,6 +30,7 @@ import "ace-builds/webpack-resolver";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { API_URL } from "../../utils/config";
+import { useCookies } from "react-cookie";
 
 function Solver() {
 	const { id } = useParams();
@@ -37,6 +38,8 @@ function Solver() {
 	const [unitTests, setUnitTests] = useState([]);
 	const [code, setCode] = useState("");
 	const [terminalOutput, setTerminalOutput] = useState([]);
+	const [cookie] = useCookies(["access"]);
+	const [passedTests, setPassedTests] = useState([]);
 
 	useEffect(() => {
 		const source = axios.CancelToken.source();
@@ -49,7 +52,7 @@ function Solver() {
 				);
 				setProblem(problemData.data.rows[0]);
 				setCode(problemData.data.rows[0].base_code);
-				const unitTestsData = axios.post(
+				const unitTestsData = await axios.post(
 					`${API_URL}/query/get-unit-tests-by-problem-id`,
 					{
 						problem_id: id,
@@ -57,13 +60,22 @@ function Solver() {
 					{ cancelToken: source.token }
 				);
 				setUnitTests(unitTestsData.data.rows);
+				const passedUnitTestsData = await await axios.post(
+					`${API_URL}/query/get-unit-tests-results-by-user`,
+					{
+						_user_id: cookie["access"]._user_id,
+						problem_id: id,
+					},
+					{ cancelToken: source.token }
+				);
+				setPassedTests(passedUnitTestsData.data.rows);
 			} catch (error) {}
 		};
 		getMasterData();
 		return () => {
 			source.cancel();
 		};
-	}, [id]);
+	}, [id, cookie]);
 
 	const handleRun = async () => {
 		let date = new Date();
@@ -71,6 +83,10 @@ function Solver() {
 		setTerminalOutput([
 			date.toISOString().replace("T", " ").replace("Z", "").split(".")[0],
 		]);
+		await axios.post(`${API_URL}/query/delete-user-unit-tests`, {
+			_user_id: cookie["access"]._user_id,
+			problem_id: problem.problem_id,
+		});
 		for (let i = 0; i < unitTests.length; i++) {
 			try {
 				const unitTest = unitTests[i];
@@ -83,12 +99,23 @@ function Solver() {
 					prevState.concat(`${codeExecutionResponse.data.message}`)
 				);
 				if (codeExecutionResponse.data.message === unitTest.output) {
-					console.log("[FLAG]", unitTest.unit_test_id);
+					await axios.post(`${API_URL}/crud/_user_unit_test`, {
+						_user_id: cookie["access"]._user_id,
+						unit_test_id: unitTest.unit_test_id,
+					});
 				}
 			} catch (error) {
 				console.error(error);
 			}
 		}
+		const passedUnitTestsData = await await axios.post(
+			`${API_URL}/query/get-unit-tests-results-by-user`,
+			{
+				_user_id: cookie["access"]._user_id,
+				problem_id: id,
+			}
+		);
+		setPassedTests(passedUnitTestsData.data.rows);
 	};
 
 	return (
@@ -184,7 +211,16 @@ function Solver() {
 													</TableCell>
 													<TableCell>{row.input}</TableCell>
 													<TableCell>{row.output}</TableCell>
-													<TableCell>{true ? <Check /> : <Error />}</TableCell>
+													<TableCell>
+														{passedTests.find(
+															(passedTest) =>
+																passedTest.unit_test_id === row.unit_test_id
+														) ? (
+															<Check />
+														) : (
+															<Error />
+														)}
+													</TableCell>
 												</TableRow>
 											))}
 										</TableBody>

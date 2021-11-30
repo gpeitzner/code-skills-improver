@@ -26,7 +26,7 @@ function Navigation() {
 					<Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
 						Code Skills Improver
 					</Typography>
-					{!cookie["access"] === undefined && (
+					{cookie["access"] !== undefined && (
 						<IconButton
 							size="large"
 							aria-label="account of current user"
