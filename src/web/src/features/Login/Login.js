@@ -1,8 +1,11 @@
 import "./Login.css";
 
 import { Box, TextField, Button, Alert } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
+import axios from "axios";
+import { API_URL } from "../../utils/config";
+import { useCookies } from "react-cookie";
 
 function Login() {
 	const [userCredentials, setUserCredentials] = useState({
@@ -15,12 +18,33 @@ function Login() {
 		show: false,
 	});
 	const history = useHistory();
+	const [cookie, setCookie] = useCookies(["access"]);
 
 	const handleInput = (e, attribute) => {
 		setUserCredentials({
 			...userCredentials,
 			[attribute]: e.target.value.toString(),
 		});
+	};
+
+	useEffect(() => {
+		if (cookie["access"] !== undefined) {
+			if (cookie["access"].user_type_id === 1)
+				return history.push("/adminHome");
+			history.push("/studentHome");
+		}
+	}, [cookie, history]);
+
+	const loginRequest = async () => {
+		try {
+			const response = await axios.post(`${API_URL}/query/login`, {
+				email: userCredentials.email,
+				password: userCredentials.password,
+			});
+			return [response.data, null];
+		} catch (error) {
+			return [null, error];
+		}
 	};
 
 	const handleLogin = async () => {
@@ -35,20 +59,12 @@ function Login() {
 		if (alertNotification.show) {
 			displayNotification("", "", false);
 		}
-		if (
-			userCredentials.email === "admin" &&
-			userCredentials.password === "admin"
-		) {
-			history.push(`adminHome`);
-			return;
-		}
-		if (
-			userCredentials.email === "student" &&
-			userCredentials.password === "student"
-		) {
-			history.push(`studentHome`);
-			return;
-		}
+		const [loginData] = await loginRequest();
+		if (!loginData) return;
+		if (loginData.rows.length === 0) return;
+		setCookie("access", loginData.rows[0], { path: "/" });
+		if (loginData.rows[0].user_type_id === 1) return history.push("/adminHome");
+		history.push("/studentHome");
 	};
 
 	const displayNotification = (type, message, show) => {

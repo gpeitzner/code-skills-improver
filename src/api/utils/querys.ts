@@ -25,6 +25,10 @@ const querys: Query[] = [
 		name: "get-problem-by-id",
 		dml: "SELECT * FROM problem WHERE problem_id = $1",
 	},
+	{
+		name: "login",
+		dml: "SELECT * FROM _user WHERE email = $1 AND password = $2",
+	},
 ];
 
 export default querys;

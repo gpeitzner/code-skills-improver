@@ -2,8 +2,14 @@ import "./Navigation.css";
 
 import { AppBar, Box, Toolbar, Typography, IconButton } from "@mui/material";
 import { Code } from "@mui/icons-material";
+import { useHistory } from "react-router-dom";
+import { useCookies } from "react-cookie";
+import ExitToApp from "@mui/icons-material/ExitToApp";
 
 function Navigation() {
+	const [cookie, , removeCookie] = useCookies(["access"]);
+	const history = useHistory();
+
 	return (
 		<Box sx={{ flexGrow: 1 }}>
 			<AppBar position="static">
@@ -20,6 +26,21 @@ function Navigation() {
 					<Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
 						Code Skills Improver
 					</Typography>
+					{!cookie["access"] === undefined && (
+						<IconButton
+							size="large"
+							aria-label="account of current user"
+							aria-controls="menu-appbar"
+							aria-haspopup="true"
+							onClick={() => {
+								removeCookie("access");
+								history.push("/");
+							}}
+							color="inherit"
+						>
+							<ExitToApp />
+						</IconButton>
+					)}
 				</Toolbar>
 			</AppBar>
 		</Box>

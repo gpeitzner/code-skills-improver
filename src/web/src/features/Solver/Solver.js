@@ -39,22 +39,30 @@ function Solver() {
 	const [terminalOutput, setTerminalOutput] = useState([]);
 
 	useEffect(() => {
-		function getMasterData() {
-			axios
-				.post(`${API_URL}/query/get-problem-by-id`, { problem_id: id })
-				.then((response) => {
-					setProblem(response.data.rows[0]);
-					setCode(response.data.rows[0].base_code);
-				});
-			axios
-				.post(`${API_URL}/query/get-unit-tests-by-problem-id`, {
-					problem_id: id,
-				})
-				.then((response) => {
-					setUnitTests(response.data.rows);
-				});
-		}
+		const source = axios.CancelToken.source();
+		const getMasterData = async () => {
+			try {
+				const problemData = await axios.post(
+					`${API_URL}/query/get-problem-by-id`,
+					{ problem_id: id },
+					{ cancelToken: source.token }
+				);
+				setProblem(problemData.data.rows[0]);
+				setCode(problemData.data.rows[0].base_code);
+				const unitTestsData = axios.post(
+					`${API_URL}/query/get-unit-tests-by-problem-id`,
+					{
+						problem_id: id,
+					},
+					{ cancelToken: source.token }
+				);
+				setUnitTests(unitTestsData.data.rows);
+			} catch (error) {}
+		};
 		getMasterData();
+		return () => {
+			source.cancel();
+		};
 	}, [id]);
 
 	const handleRun = async () => {

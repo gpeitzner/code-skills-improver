@@ -48,9 +48,19 @@ function StudentHome() {
 	const [problems, setProblems] = useState([]);
 
 	useEffect(() => {
-		axios.get(`${API_URL}/crud/problem`).then((response) => {
-			setProblems(response.data);
-		});
+		const source = axios.CancelToken.source();
+		const fetchMasterData = async () => {
+			try {
+				const response = await axios.get(`${API_URL}/crud/problem`, {
+					cancelToken: source.token,
+				});
+				setProblems(response.data);
+			} catch (error) {}
+		};
+		fetchMasterData();
+		return () => {
+			source.cancel();
+		};
 	}, []);
 
 	return (
