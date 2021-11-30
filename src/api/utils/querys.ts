@@ -67,6 +67,14 @@ const querys: Query[] = [
 				_user_unit_test._user_id = $1
 		`,
 	},
+	{
+		name: "delete-problem-solution",
+		dml: "DELETE FROM _user_problem WHERE _user_problem._user_id = $1 AND _user_problem.problem_id = $2",
+	},
+	{
+		name: "get-user-problem-solution",
+		dml: "SELECT code FROM _user_problem WHERE _user_problem._user_id = $1 AND _user_problem.problem_id = $2",
+	},
 ];
 
 export default querys;

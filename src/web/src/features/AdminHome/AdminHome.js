@@ -46,7 +46,10 @@ function AdminHome() {
 					</Grid>
 					<Grid item xs={12} sm={4} md={4} lg={3} xl={3}>
 						<Box sx={{ height: "100%" }}>
-							<Card sx={{ height: "40vh" }}>
+							<Card
+								sx={{ height: "40vh" }}
+								onClick={() => history.push("problem")}
+							>
 								<CardActionArea sx={{ height: "100%" }}>
 									<CardHeader title="Problems" />
 									<CardContent>

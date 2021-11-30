@@ -51,7 +51,6 @@ function Solver() {
 					{ cancelToken: source.token }
 				);
 				setProblem(problemData.data.rows[0]);
-				setCode(problemData.data.rows[0].base_code);
 				const unitTestsData = await axios.post(
 					`${API_URL}/query/get-unit-tests-by-problem-id`,
 					{
@@ -60,7 +59,7 @@ function Solver() {
 					{ cancelToken: source.token }
 				);
 				setUnitTests(unitTestsData.data.rows);
-				const passedUnitTestsData = await await axios.post(
+				const passedUnitTestsData = await axios.post(
 					`${API_URL}/query/get-unit-tests-results-by-user`,
 					{
 						_user_id: cookie["access"]._user_id,
@@ -69,6 +68,17 @@ function Solver() {
 					{ cancelToken: source.token }
 				);
 				setPassedTests(passedUnitTestsData.data.rows);
+				const problemSolutionData = await axios.post(
+					`${API_URL}/query/get-user-problem-solution`,
+					{
+						_user_id: cookie["access"]._user_id,
+						problem_id: id,
+					},
+					{ cancelToken: source.token }
+				);
+				if (problemSolutionData.data.rows.length > 0)
+					return setCode(problemSolutionData.data.rows[0].code);
+				setCode(problemData.data.rows[0].base_code);
 			} catch (error) {}
 		};
 		getMasterData();
@@ -84,6 +94,10 @@ function Solver() {
 			date.toISOString().replace("T", " ").replace("Z", "").split(".")[0],
 		]);
 		await axios.post(`${API_URL}/query/delete-user-unit-tests`, {
+			_user_id: cookie["access"]._user_id,
+			problem_id: problem.problem_id,
+		});
+		await axios.post(`${API_URL}/query/delete-problem-solution`, {
 			_user_id: cookie["access"]._user_id,
 			problem_id: problem.problem_id,
 		});
@@ -108,7 +122,7 @@ function Solver() {
 				console.error(error);
 			}
 		}
-		const passedUnitTestsData = await await axios.post(
+		const passedUnitTestsData = await axios.post(
 			`${API_URL}/query/get-unit-tests-results-by-user`,
 			{
 				_user_id: cookie["access"]._user_id,
@@ -116,6 +130,11 @@ function Solver() {
 			}
 		);
 		setPassedTests(passedUnitTestsData.data.rows);
+		await axios.post(`${API_URL}/crud/_user_problem`, {
+			_user_id: cookie["access"]._user_id,
+			problem_id: problem.problem_id,
+			code: code,
+		});
 	};
 
 	return (
@@ -207,7 +226,7 @@ function Solver() {
 													}}
 												>
 													<TableCell component="th" scope="row">
-														{row.number}
+														{i + 1}
 													</TableCell>
 													<TableCell>{row.input}</TableCell>
 													<TableCell>{row.output}</TableCell>
