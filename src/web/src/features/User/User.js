@@ -1,4 +1,5 @@
 import "./User.css";
+import { useState, useEffect } from "react";
 
 import {
   Box,
@@ -10,122 +11,137 @@ import {
   FormControl,
   Autocomplete,
 } from "@mui/material";
-import { useState } from "react";
-
 import DatePicker from "@mui/lab/DatePicker";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
-import axios from "axios";
-import { API_URL } from "../../utils/config";
+
+import Alert from "../../components/Alert/Index";
+
+import { get, save, update, _delete } from "./Service";
+import { validateUser } from "./Utils";
+
+/**
+ * Initial state for the user.
+ *
+ * @typedef {Object} UserInitialState
+ * @property {number} _user_id - The user ID.
+ * @property {number} user_type_id - The user type ID.
+ * @property {string} first_name - The user's first name.
+ * @property {string} last_name - The user's last name.
+ * @property {string} phone - The user's phone number.
+ * @property {string} address - The user's address.
+ * @property {string} email - The user's email address.
+ * @property {Date|null} born_date - The user's date of birth (or null if unknown).
+ * @property {string} password - The user's password.
+ */
+const userInitialState = {
+  _user_id: 0,
+  user_type_id: 0,
+  first_name: "",
+  last_name: "",
+  phone: "",
+  address: "",
+  email: "",
+  born_date: null,
+  password: "",
+};
 
 function User() {
-  const userInitialState = {
-    _user_id: 0,
-    user_type_id: 0,
-    first_name: "",
-    last_name: "",
-    phone: "",
-    address: "",
-    email: "",
-    born_date: null,
-    password: "",
-  };
-
-  const [search, setSearch] = useState("");
   const [user, setUser] = useState(userInitialState);
+  const [users, setUsers] = useState([]);
 
-  const searchRequest = async (email) => {
-    try {
-      const response = await axios.post(`${API_URL}/query/get-user-by-id`, {
-        email: email,
-      });
-      return [response.data.rows[0], null];
-    } catch (error) {
-      return [null, error];
-    }
-  };
-
-  const handleSearch = async () => {
-    if (search === "") return;
-    const [searchData] = await searchRequest(search);
-    if (!searchData) {
-      setUser({ ...user, ...userInitialState, email: search });
-      return;
-    }
-    setUser({ ...user, ...searchData });
-  };
+  const [alert, setAlert] = useState(null);
 
   const handleSelect = (event, attribute) => {
     setUser({ ...user, [attribute]: parseInt(event.target.value.toString()) });
   };
 
-  const saveRequest = async (user) => {
-    try {
-      const response = await axios.post(`${API_URL}/crud/_user`, user);
-      return [response.data.data[0], null];
-    } catch (error) {
-      return [null, error];
-    }
-  };
-
-  const updateRequest = async (user) => {
-    try {
-      const response = await axios.put(`${API_URL}/crud/_user`, {
-        filter: {
-          _user_id: user._user_id,
-        },
-        new: user,
+  const handleSave = async (user, setAlert) => {
+    if (!validateUser(user, setAlert)) return;
+    let userData = user;
+    delete userData._user_id;
+    const saveData = await save(userData);
+    if (!saveData)
+      return setAlert({
+        type: "error",
+        message: "Error saving user",
       });
-      return [response.data.data[0], null];
-    } catch (error) {
-      return [null, error];
-    }
+    const users = await get();
+    setUsers(users);
+    setUser(saveData);
+    setAlert({
+      type: "success",
+      message: "User saved successfully",
+    });
   };
 
-  const handleSubmit = async () => {
-    if (user._user_id === 0) {
-      if (user.email === "") return;
-      if (user.user_type_id === 0) return;
-      if (user.first_name === "") return;
-      if (user.last_name === "") return;
-      if (user.phone === "") return;
-      if (user.address === "") return;
-      if (user.born_date === "") return;
-      if (user.password === "") return;
-      let userData = user;
-      delete userData._user_id;
-      const [saveData] = await saveRequest(userData);
-      if (!saveData) return;
-      setUser({ ...user, ...saveData });
-      return;
-    }
+  const handleUpdate = async (user, setAlert) => {
+    if (!validateUser(user, setAlert)) return;
     const userData = user;
-    const [updateData] = await updateRequest(userData);
-    if (!updateData) return;
-    setUser({ ...user, ...updateData });
+    const updateData = await update(userData);
+    if (!updateData)
+      return setAlert({ type: "error", message: "Error updating user" });
+    const users = await get();
+    setUsers(users);
+    setUser(updateData);
+    setAlert({
+      type: "success",
+      message: "User updated successfully",
+    });
   };
+
+  const handleDelete = async (user) => {
+    const userData = user;
+    const deleteData = await _delete(userData);
+    if (!deleteData)
+      return setAlert({ type: "error", message: "Error deleting user" });
+    const users = await get();
+    setUsers(users);
+    setUser(userInitialState);
+    setAlert({
+      type: "success",
+      message: "User deleted successfully",
+    });
+  };
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await get();
+        setUsers(response);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchUsers();
+  }, []);
 
   return (
     <div className="User">
       <Box component="form" sx={{ width: "50vw" }}>
-        <TextField
+        <Autocomplete
+          disablePortal
+          id="combo-box"
+          options={users?.map((user) => ({
+            label: user.email,
+            id: user._user_id,
+          }))}
           sx={{ width: "100%", marginBottom: "10px" }}
-          id="search-email"
-          label="Email"
-          variant="outlined"
-          type="email"
-          onInput={(e) => {
-            setSearch(e.target.value.toString());
-            setUser({ ...user, email: e.target.value.toString() });
+          renderInput={(params) => <TextField {...params} label="Email" />}
+          value={user.email}
+          onChange={(event, value) => {
+            if (!value) return;
+
+            const currentUser = users.find(
+              (user) => user._user_id === value.id
+            );
+            setUser(currentUser);
+          }}
+          onInputChange={(_, value) => {
+            setUser({ ...userInitialState, email: value });
           }}
         />
-        <Button
-          variant="contained"
-          sx={{ width: "100%", marginBottom: "20px" }}
-          onClick={handleSearch}
-        >
-          Search
-        </Button>
+
         <Divider sx={{ marginBottom: "20px" }}>User Info</Divider>
         <Select
           sx={{ width: "100%", marginBottom: "10px" }}
@@ -202,14 +218,37 @@ function User() {
           }
           value={user.password}
         />
-        <Button
-          variant="contained"
-          sx={{ width: "100%", marginBottom: "20px" }}
-          onClick={handleSubmit}
-          color="success"
-        >
-          {user._user_id === 0 ? "SAVE" : "UPDATE"}
-        </Button>
+        {user._user_id === 0 && (
+          <Button
+            variant="contained"
+            sx={{ width: "100%", marginBottom: "20px", marginTop: "20px" }}
+            onClick={() => handleSave(user, setAlert)}
+            color="success"
+          >
+            {"SAVE"}
+          </Button>
+        )}
+        {user._user_id !== 0 && (
+          <Button
+            variant="contained"
+            sx={{ width: "100%", marginBottom: "20px", marginTop: "20px" }}
+            onClick={() => handleUpdate(user, setAlert)}
+            color="secondary"
+          >
+            {"UPDATE"}
+          </Button>
+        )}
+        {user._user_id !== 0 && (
+          <Button
+            variant="contained"
+            sx={{ width: "100%", marginBottom: "20px" }}
+            onClick={() => handleDelete(user)}
+            color="error"
+          >
+            {"DELETE"}
+          </Button>
+        )}
+        <Alert {...alert} />
       </Box>
     </div>
   );
