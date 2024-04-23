@@ -1,4 +1,4 @@
 export interface Query {
-	name: string;
-	dml: string;
+  name: string;
+  dml: string;
 }
