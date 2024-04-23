@@ -49,55 +49,93 @@ const userInitialState = {
 function User() {
   const [user, setUser] = useState(userInitialState);
   const [users, setUsers] = useState([]);
-
   const [alert, setAlert] = useState(null);
 
+  /**
+   * Handles the selection of an attribute.
+   *
+   * @param {Event} event - The event object.
+   * @param {string} attribute - The attribute to be updated.
+   */
   const handleSelect = (event, attribute) => {
     setUser({ ...user, [attribute]: parseInt(event.target.value.toString()) });
   };
 
+  /**
+   * Handles saving a user.
+   *
+   * @param {Object} user - The user object to be saved.
+   * @param {Function} setAlert - The function to set the alert message.
+   * @returns {Promise<void>} - A promise that resolves when the user is saved.
+   */
   const handleSave = async (user, setAlert) => {
+    setAlert(null);
+
     if (!validateUser(user, setAlert)) return;
     let userData = user;
     delete userData._user_id;
+
     const saveData = await save(userData);
     if (!saveData)
       return setAlert({
         type: "error",
         message: "Error saving user",
       });
+    setUser(saveData);
+
     const users = await get();
     setUsers(users);
-    setUser(saveData);
+
     setAlert({
       type: "success",
       message: "User saved successfully",
     });
   };
 
+  /**
+   * Handles the update of a user.
+   *
+   * @param {Object} user - The user object to be updated.
+   * @param {Function} setAlert - The function to set the alert message.
+   * @returns {Promise<void>} - A promise that resolves when the update is complete.
+   */
   const handleUpdate = async (user, setAlert) => {
+    setAlert(null);
+
     if (!validateUser(user, setAlert)) return;
     const userData = user;
     const updateData = await update(userData);
     if (!updateData)
       return setAlert({ type: "error", message: "Error updating user" });
+    setUser(updateData);
+
     const users = await get();
     setUsers(users);
-    setUser(updateData);
+
     setAlert({
       type: "success",
       message: "User updated successfully",
     });
   };
 
-  const handleDelete = async (user) => {
+  /**
+   * Deletes a user and updates the user list.
+   * @param {Object} user - The user object to be deleted.
+   * @param {Function} setAlert - The function to set the alert message.
+   * @returns {Promise<void>} - A promise that resolves when the user is deleted and the user list is updated.
+   */
+  const handleDelete = async (user, setAlert) => {
+    setAlert(null);
+
     const userData = user;
     const deleteData = await _delete(userData);
     if (!deleteData)
       return setAlert({ type: "error", message: "Error deleting user" });
+    setUser(userInitialState);
+
     const users = await get();
     setUsers(users);
-    setUser(userInitialState);
+
     setAlert({
       type: "success",
       message: "User deleted successfully",
@@ -129,7 +167,7 @@ function User() {
           sx={{ width: "100%", marginBottom: "10px" }}
           renderInput={(params) => <TextField {...params} label="Email" />}
           value={user.email}
-          onChange={(event, value) => {
+          onChange={(_, value) => {
             if (!value) return;
 
             const currentUser = users.find(
@@ -242,7 +280,7 @@ function User() {
           <Button
             variant="contained"
             sx={{ width: "100%", marginBottom: "20px" }}
-            onClick={() => handleDelete(user)}
+            onClick={() => handleDelete(user, setAlert)}
             color="error"
           >
             {"DELETE"}
