@@ -1,0 +1,34 @@
+version: "3"
+services:
+  app:
+    build:
+      context: ./web
+      args:
+        REACT_APP_API_URL: ${REACT_APP_API_URL}
+    image: csi_web
+    ports:
+      - "80:80"
+  api:
+    build: ./api
+    image: csi_api
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=db
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+    depends_on:
+      - db
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+volumes:
+  db_data:
