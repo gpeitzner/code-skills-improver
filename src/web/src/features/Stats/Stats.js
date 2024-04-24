@@ -122,7 +122,7 @@ function Stats() {
         metadata.push({
           ...problem,
           passedTests: `${passedTests}/${problemUnitTests.length}`,
-          score,
+          score: Math.ceil(score),
         });
       }
     }
@@ -163,7 +163,7 @@ function Stats() {
         metadata.push({
           ...user,
           passedTests: `${passedTests}/${problemUnitTests.length}`,
-          score,
+          score: Math.ceil(score),
         });
       }
     }

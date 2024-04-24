@@ -19,6 +19,7 @@ import {
   List,
   ListItem,
   ListItemText,
+  Chip,
 } from "@mui/material";
 
 import problemImage from "../../assets/problem_image.jpg";
@@ -40,6 +41,7 @@ function Solver() {
   const [terminalOutput, setTerminalOutput] = useState([]);
   const [cookie] = useCookies(["access"]);
   const [passedTests, setPassedTests] = useState([]);
+  const [score, setScore] = useState(0);
 
   useEffect(() => {
     const source = axios.CancelToken.source();
@@ -67,6 +69,13 @@ function Solver() {
           },
           { cancelToken: source.token }
         );
+
+        const score =
+          (passedUnitTestsData.data.rows.length /
+            unitTestsData.data.rows.length) *
+          100;
+        setScore(Math.ceil(score));
+
         setPassedTests(passedUnitTestsData.data.rows);
         const problemSolutionData = await axios.post(
           `${API_URL}/query/get-user-problem-solution`,
@@ -130,6 +139,19 @@ function Solver() {
       }
     );
     setPassedTests(passedUnitTestsData.data.rows);
+
+    const unitTestsData = await axios.post(
+      `${API_URL}/query/get-unit-tests-by-problem-id`,
+      {
+        problem_id: id,
+      }
+    );
+
+    const score =
+      (passedUnitTestsData.data.rows.length / unitTestsData.data.rows.length) *
+      100;
+    setScore(Math.ceil(score));
+
     await axios.post(`${API_URL}/crud/_user_problem`, {
       _user_id: cookie["access"]._user_id,
       problem_id: problem.problem_id,
@@ -245,6 +267,13 @@ function Solver() {
                     </TableBody>
                   </Table>
                 </TableContainer>
+                <Box
+                  display="flex"
+                  justifyContent="flex-end"
+                  style={{ marginTop: "10px" }}
+                >
+                  <Chip label={`Score: ${score}`} color="primary" />
+                </Box>
               </CardContent>
             </Card>
           </Grid>
