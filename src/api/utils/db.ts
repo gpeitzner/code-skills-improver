@@ -1,9 +1,6 @@
 import { Pool } from "pg";
 
-const pool = new Pool({
-  user: "postgres",
-  password: "dev",
-});
+const pool = new Pool({});
 
 /**
  * Connection error handling
