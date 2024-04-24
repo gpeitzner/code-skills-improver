@@ -60,8 +60,14 @@ function Login() {
       displayNotification("", "", false);
     }
     const [loginData] = await loginRequest();
-    if (!loginData) return;
-    if (loginData.rows.length === 0) return;
+    if (!loginData) {
+      displayNotification("error", "Bad credentials", true);
+      return;
+    }
+    if (loginData.rows.length === 0) {
+      displayNotification("error", "Bad credentials", true);
+      return;
+    }
     setCookie("access", loginData.rows[0], { path: "/" });
     if (loginData.rows[0].user_type_id === 1) return history.push("/adminHome");
     history.push("/studentHome");
