@@ -88,7 +88,10 @@ function StudentHome() {
                         <Typography variant="h6" component="div">
                           {problem.title}
                         </Typography>
-                        <Typography variant="body1">
+                        <Typography
+                          variant="body1"
+                          sx={{ overflow: "auto", maxHeight: "50px" }}
+                        >
                           {problem.description}
                         </Typography>
                       </CardContent>

@@ -179,7 +179,12 @@ function Solver() {
                 <Typography variant="h6" component="div">
                   {problem.title}
                 </Typography>
-                <Typography variant="body1">{problem.description}</Typography>
+                <Typography
+                  variant="body1"
+                  sx={{ overflow: "auto", maxHeight: "50px" }}
+                >
+                  {problem.description}
+                </Typography>
               </CardContent>
             </Card>
           </Grid>
