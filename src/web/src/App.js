@@ -1,6 +1,11 @@
 import "./App.css";
 
+import { useEffect } from "react";
+import { useCookies } from "react-cookie";
+import { useHistory } from "react-router";
+
 import { Switch, Route } from "react-router-dom";
+
 import Navigation from "./features/Navigation/Navigation";
 import AdminHome from "./features/AdminHome/AdminHome";
 import Login from "./features/Login/Login";
@@ -8,9 +13,7 @@ import StudentHome from "./features/StudentHome/StudentHome";
 import Solver from "./features/Solver/Solver";
 import User from "./features/User/User";
 import Problem from "./features/Problem/Problem";
-import { useCookies } from "react-cookie";
-import { useEffect } from "react";
-import { useHistory } from "react-router";
+import Stats from "./features/Stats/Stats";
 
 function App() {
   const [cookie] = useCookies(["access"]);
@@ -43,6 +46,9 @@ function App() {
         </Route>
         <Route exact path="/problem">
           <Problem />
+        </Route>
+        <Route exact path="/stats">
+          <Stats />
         </Route>
       </Switch>
     </div>
