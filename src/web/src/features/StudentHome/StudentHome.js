@@ -73,7 +73,7 @@ function StudentHome() {
                 <Grid item xs={12} sm={4} md={4} lg={3} xl={3} key={i}>
                   <Box sx={{ height: "100%" }}>
                     <Card
-                      sx={{ minHeight: "40vh" }}
+                      sx={{ minHeight: "60vh" }}
                       onClick={() =>
                         history.push(`solver/${problem.problem_id}`)
                       }
