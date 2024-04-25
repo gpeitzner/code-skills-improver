@@ -84,7 +84,12 @@ function Login() {
 
   return (
     <div className="Login">
-      <Box component="form" sx={{ width: "40vh" }}>
+      <Box
+        component="form"
+        sx={{
+          width: { xs: "90vw", sm: "80vw", md: "60vw", lg: "40vw", xl: "30vw" },
+        }}
+      >
         <TextField
           sx={{ width: "100%", marginBottom: "10px" }}
           id="login-email"
