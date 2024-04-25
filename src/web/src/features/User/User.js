@@ -159,7 +159,7 @@ function User() {
       <Box
         component="form"
         sx={{
-          width: { xs: "90vw", sm: "80vw", md: "60vw", lg: "40vw", xl: "30vw" },
+          width: { xs: "90vw", sm: "80vw", md: "70vw", lg: "50vw", xl: "40vw" },
         }}
       >
         <Autocomplete

@@ -242,7 +242,12 @@ function Problem() {
 
   return (
     <div className="Problem">
-      <Box component="form" sx={{ width: "60vw" }}>
+      <Box
+        component="form"
+        sx={{
+          width: { xs: "90vw", sm: "80vw", md: "70vw", lg: "50vw", xl: "40vw" },
+        }}
+      >
         <Autocomplete
           disablePortal
           id="combo-box"

@@ -170,7 +170,7 @@ function Solver() {
             md={12}
             lg={6}
             xl={6}
-            sx={{ height: "45vh" }}
+            sx={{ minHeight: "45vh" }}
           >
             <Card sx={{ height: "100%" }}>
               <CardHeader title="Problem" />
@@ -179,12 +179,7 @@ function Solver() {
                 <Typography variant="h6" component="div">
                   {problem.title}
                 </Typography>
-                <Typography
-                  variant="body1"
-                  sx={{ overflow: "auto", maxHeight: "50px" }}
-                >
-                  {problem.description}
-                </Typography>
+                <Typography variant="body1">{problem.description}</Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -195,7 +190,7 @@ function Solver() {
             md={12}
             lg={6}
             xl={6}
-            sx={{ height: "45vh" }}
+            sx={{ minHeight: "45vh" }}
           >
             <AceEditor
               style={{ height: "90%", width: "100%" }}
@@ -224,7 +219,7 @@ function Solver() {
             md={12}
             lg={6}
             xl={6}
-            sx={{ height: "45vh" }}
+            sx={{ minHeight: "45vh" }}
           >
             <Card sx={{ height: "100%" }}>
               <CardHeader title="Tests" />
@@ -289,7 +284,7 @@ function Solver() {
             md={12}
             lg={6}
             xl={6}
-            sx={{ height: "45vh" }}
+            sx={{ minHeight: "45vh" }}
           >
             <Card
               sx={{ height: "100%", backgroundColor: "black", color: "white" }}

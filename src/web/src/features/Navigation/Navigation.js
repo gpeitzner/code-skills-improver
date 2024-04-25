@@ -41,7 +41,7 @@ function Navigation() {
               aria-haspopup="true"
               onClick={() => {
                 removeCookie("access");
-                history.push("/");
+                setTimeout(() => history.push("/"), 1000);
               }}
               color="inherit"
             >

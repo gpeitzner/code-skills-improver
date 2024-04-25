@@ -73,7 +73,7 @@ function StudentHome() {
                 <Grid item xs={12} sm={4} md={4} lg={3} xl={3} key={i}>
                   <Box sx={{ height: "100%" }}>
                     <Card
-                      sx={{ height: "40vh" }}
+                      sx={{ minHeight: "40vh" }}
                       onClick={() =>
                         history.push(`solver/${problem.problem_id}`)
                       }
@@ -88,10 +88,7 @@ function StudentHome() {
                         <Typography variant="h6" component="div">
                           {problem.title}
                         </Typography>
-                        <Typography
-                          variant="body1"
-                          sx={{ overflow: "auto", maxHeight: "50px" }}
-                        >
+                        <Typography variant="body1">
                           {problem.description}
                         </Typography>
                       </CardContent>
