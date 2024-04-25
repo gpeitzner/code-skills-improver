@@ -156,7 +156,12 @@ function User() {
 
   return (
     <div className="User">
-      <Box component="form" sx={{ width: "60vw" }}>
+      <Box
+        component="form"
+        sx={{
+          width: { xs: "90vw", sm: "80vw", md: "60vw", lg: "40vw", xl: "30vw" },
+        }}
+      >
         <Autocomplete
           disablePortal
           id="combo-box"
