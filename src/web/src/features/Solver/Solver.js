@@ -22,7 +22,6 @@ import {
   Chip,
 } from "@mui/material";
 
-import problemImage from "../../assets/problem_image.jpg";
 import testsImage from "../../assets/tests_image.jpg";
 import { Check, Error, PlayCircle } from "@mui/icons-material";
 import AceEditor from "react-ace";
@@ -33,6 +32,14 @@ import axios from "axios";
 import { API_URL } from "../../utils/config";
 import { useCookies } from "react-cookie";
 
+function hashTitleToNumber(title) {
+  let hash = 0;
+  for (let i = 0; i < title.length; i++) {
+    hash = ((hash << 5) - hash + title.charCodeAt(i)) | 0;
+  }
+  return (Math.abs(hash) % 15) + 1;
+}
+
 function Solver() {
   const { id } = useParams();
   const [problem, setProblem] = useState({});
@@ -42,6 +49,7 @@ function Solver() {
   const [cookie] = useCookies(["access"]);
   const [passedTests, setPassedTests] = useState([]);
   const [score, setScore] = useState(0);
+  const [problemImage, setProblemImage] = useState("");
 
   useEffect(() => {
     const source = axios.CancelToken.source();
@@ -53,6 +61,10 @@ function Solver() {
           { cancelToken: source.token }
         );
         setProblem(problemData.data.rows[0]);
+        const imageNumber = hashTitleToNumber(problemData.data.rows[0].title);
+        const problemImage =
+          require(`../../assets/problem${imageNumber}.png`).default;
+        setProblemImage(problemImage);
         const unitTestsData = await axios.post(
           `${API_URL}/query/get-unit-tests-by-problem-id`,
           {
@@ -173,12 +185,9 @@ function Solver() {
             sx={{ minHeight: "45vh" }}
           >
             <Card sx={{ height: "100%" }}>
-              <CardHeader title="Problem" />
+              <CardHeader title={problem.title} />
               <CardMedia component="img" height="100" image={problemImage} />
               <CardContent>
-                <Typography variant="h6" component="div">
-                  {problem.title}
-                </Typography>
                 <Typography variant="body1">{problem.description}</Typography>
               </CardContent>
             </Card>

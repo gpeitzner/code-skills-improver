@@ -1,7 +1,6 @@
 import express from "express";
 const router = express.Router();
 
-import pool from "../utils/db";
 import util from "util";
 import { exec } from "child_process";
 import fs from "fs";
